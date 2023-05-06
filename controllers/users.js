@@ -16,7 +16,8 @@ module.exports.getAllUsers = (req, res) => {
 
 module.exports.getCurrentUser = (req, res) => {
   User
-    .findById(req.params.userId).orFail()
+    .findById(req.params.userId)
+    .orFail()
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
@@ -31,9 +32,7 @@ module.exports.getCurrentUser = (req, res) => {
 };
 
 module.exports.createUser = (req, res) => {
-  const {
-    name, about, avatar,
-  } = req.body;
+  const { name, about, avatar } = req.body;
 
   User
     .create({
@@ -57,7 +56,7 @@ module.exports.updateProfile = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Пользователь не найден' });
+        return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден' });
       }
       if (err.name === 'ValidationError') {
         return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Переданы не корректные данные при обновлении профиля' });
@@ -75,7 +74,7 @@ module.exports.updateAvatar = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Пользователь не найден' });
+        return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден' });
       }
       if (err.name === 'ValidationError') {
         return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Переданы не корректные данные при обновлении аватара' });
