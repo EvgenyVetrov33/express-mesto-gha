@@ -1,47 +1,39 @@
-const httpConstants = require('http2').constants;
 const Card = require('../models/card');
-
-const {
-  HTTP_STATUS_CREATED,
-  HTTP_STATUS_BAD_REQUEST,
-  HTTP_STATUS_NOT_FOUND,
-  HTTP_STATUS_INTERNAL_SERVER_ERROR,
-  HTTP_STATUS_OK,
-} = httpConstants;
 
 module.exports.getAllCards = (req, res) => {
   Card
-    .find({}).populate(['owner', 'likes'])
-    .then((cards) => res.status(HTTP_STATUS_OK).send(cards))
-    .catch(() => res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' }));
+    .find({})
+    .then((cards) => res.status(200).send(cards))
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка при запросе всех карточек' }));
 };
 
 module.exports.createCard = (req, res) => {
+  console.log(req.user._id);
   const { name, link } = req.body;
-
+  const owner = req.user._id;
   Card
-    .create({ name, link, owner: req.user._id })
-    .then((card) => res.status(HTTP_STATUS_CREATED).send(card))
+    .create({ name, link, owner })
+    .then((card) => res.status(201).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании карточки' });
+        return res.status(400).send({ message: 'Переданы некорректные данные при создании карточки' });
       }
-      return res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' });
+      return res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
 
 module.exports.deleteCardById = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .orFail()
-    .then((card) => res.status(HTTP_STATUS_OK).send(card))
+    .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена.' });
+        return res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
       }
       if (err.name === 'CastError') {
-        return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Переданы некорректные данные при удалении карточки' });
+        return res.status(400).send({ message: 'Переданы некорректные данные при удалении карточки' });
       }
-      return res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+      return res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
 };
 
@@ -53,15 +45,15 @@ module.exports.likeCard = (req, res) => {
       { new: true },
     )
     .orFail()
-    .then((card) => res.status(HTTP_STATUS_OK).send(card))
+    .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена' });
+        return res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
       }
       if (err.name === 'CastError') {
-        return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Переданы некорректные данные для постановки лайка' });
+        return res.status(400).send({ message: 'Переданы некорректные данные для постановки лайка' });
       }
-      return res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' });
+      return res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -71,13 +63,13 @@ module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(
   { new: true },
 )
   .orFail()
-  .then((card) => res.status(HTTP_STATUS_OK).send(card))
+  .then((card) => res.status(200).send(card))
   .catch((err) => {
     if (err.name === 'DocumentNotFoundError') {
-      return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена' });
+      return res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
     }
     if (err.name === 'CastError') {
-      return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Переданы некорректные данные для снятия лайка' });
+      return res.status(400).send({ message: 'Переданы некорректные данные для снятия лайка' });
     }
-    return res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' });
+    return res.status(500).send({ message: 'Произошла ошибка' });
   });
