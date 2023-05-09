@@ -13,13 +13,13 @@ mongoose.connect('mongodb://127.0.0.1/mestodb ', {
   useNewUrlParser: true,
 });
 
-// app.use((req, res, next) => {
-//   req.user = {
-//     _id: '6457b0eaf5d12c76611540ec',
-//   };
+app.use((req, res, next) => {
+  req.user = {
+    _id: '6457b0eaf5d12c76611540ec',
+  };
 
-//   next();
-// });
+  next();
+});
 
 app.use('/', router);
 // app.use((req, res) => {
