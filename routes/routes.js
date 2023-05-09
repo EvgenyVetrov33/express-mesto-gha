@@ -21,10 +21,10 @@ router.post('/users', createUser);
 router.get('/users/:userId', getCurrentUser);
 router.patch('/users/me', updateProfile);
 router.patch('/users/me/avatar', updateAvatar);
-router.get('/', getAllCards);
-router.post('/', createCard);
-router.delete('/:cardId', deleteCardById);
-router.put('/:cardId/likes', likeCard);
-router.delete('/:cardId/likes', dislikeCard);
+router.get('/cards', getAllCards);
+router.post('/cards', createCard);
+router.delete('/cards/:cardId', deleteCardById);
+router.put('/cards/:cardId/likes', likeCard);
+router.delete('/cards/:cardId/likes', dislikeCard);
 
 module.exports = router;
