@@ -8,7 +8,7 @@ const cardRoutes = require('./cards');
 
 router.use('/users', userRoutes);
 router.use('/cards', cardRoutes);
-router.get('/*', (req, res) => {
+router.use('/*', (req, res) => {
   res.status(HTTP_STATUS_NOT_FOUND)
     .send({ message: 'Запрашиваемый ресурс не найден' });
 });

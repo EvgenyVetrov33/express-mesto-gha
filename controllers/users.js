@@ -70,11 +70,11 @@ module.exports.updateAvatar = (req, res) => {
     .orFail()
     .then((user) => res.send(user))
     .catch((err) => {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        return res.status(HTTP_STATUS_BAD_REQUEST_ERROR).send({ message: 'Переданы некорректные данные при обновлении аватара' });
+      }
       if (err.name === 'DocumentNotFoundError') {
         return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден.' });
-      }
-      if (err.name === 'CastError') {
-        return res.status(HTTP_STATUS_BAD_REQUEST_ERROR).send({ message: 'Переданы некорректные данные при обновлении аватара' });
       }
       return res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
     });
