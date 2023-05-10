@@ -3,15 +3,15 @@ const {
   HTTP_STATUS_BAD_REQUEST_ERROR,
   HTTP_STATUS_NOT_FOUND,
   HTTP_STATUS_INTERNAL_SERVER_ERROR,
+  HTTP_STATUS_CREATED,
+  HTTP_STATUS_OK,
 } = require('../errors/errors');
 
 module.exports.getAllCards = (req, res) => {
   console.log('getAllCards');
   Card
     .find({})
-    .then((cards) => {
-      res.send(cards);
-    })
+    .then((cards) => res.send(cards))
     .catch(() => res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' }));
 };
 
@@ -21,12 +21,10 @@ module.exports.createCard = (req, res) => {
 
   Card
     .create({ name, link, owner })
-    .then((card) => {
-      res.send(card);
-    })
+    .then((card) => res.status(HTTP_STATUS_CREATED).send(card))
     .catch((err) => {
       if (
-        res.status(err.name === 'CastError' || err.name === 'ValidationError')
+        res.status(err.name === 'ValidationError')
       ) {
         return res.status(HTTP_STATUS_BAD_REQUEST_ERROR).send({ message: 'Переданы некорректные данные при создании карточки' });
       }
@@ -37,13 +35,7 @@ module.exports.createCard = (req, res) => {
 module.exports.deleteCardById = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .orFail()
-    .then((card) => {
-      if (!card) {
-        res.send({ message: 'Карточка не найдена' });
-      } else {
-        res.send(card);
-      }
-    })
+    .then((card) => res.status(HTTP_STATUS_OK).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(HTTP_STATUS_BAD_REQUEST_ERROR).send({ message: 'Переданы некорректные данные при удалении карточки' });
@@ -62,13 +54,7 @@ module.exports.likeCard = (req, res) => {
     { new: true },
   )
     .orFail()
-    .then((card) => {
-      if (!card) {
-        res.send({ message: 'Карточка не найдена' });
-      } else {
-        res.send(card);
-      }
-    })
+    .then((card) => res.status(HTTP_STATUS_OK).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(HTTP_STATUS_BAD_REQUEST_ERROR).send({ message: 'Переданы некорректные данные для постановки лайка' });
@@ -86,18 +72,8 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(() => {
-      const newError = new Error();
-      newError.name = 'DocumentNotFoundError';
-      throw newError;
-    })
-    .then((card) => {
-      if (!card) {
-        res.send({ message: 'Карточка не найдена' });
-      } else {
-        res.send(card);
-      }
-    })
+    .orFail()
+    .then((card) => res.status(HTTP_STATUS_OK).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(HTTP_STATUS_BAD_REQUEST_ERROR).send({ message: 'Переданы некорректные данные для снятия лайка' });
