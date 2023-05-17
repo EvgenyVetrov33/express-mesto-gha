@@ -24,8 +24,8 @@ mongoose.connect('mongodb://127.0.0.1/mestodb ', {
 
 app.use('/', router);
 
-app.use(errorsHandler);
 app.use(errors());
+app.use(errorsHandler);
 
 app.listen(PORT, () => {
   console.log(`Приложение слушает порт: ${PORT}`);
