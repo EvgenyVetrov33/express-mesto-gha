@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
-const { createUser, login } = require('./controllers/users');
 const errorsHandler = require('./errors/errorsHandler');
 const router = require('./routes/index');
 
@@ -14,9 +13,6 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-
-app.post('/signin', login);
-app.post('/signup', createUser);
 
 mongoose.connect('mongodb://127.0.0.1/mestodb ', {
   useNewUrlParser: true,
